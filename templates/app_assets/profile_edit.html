@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}修改个人信息{% endblock %}
+
+{% block content %}
+  <div class="auth-center">
+    <div class="auth-card card">
+      <h1 class="auth-title">修改个人信息</h1>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="profile-edit-grid">
+          <div class="profile-edit-left">
+            <div class="avatar avatar-lg" id="avatarPreview">
+              {% if user.profile.avatar %}
+                <img id="avatarImg" src="{{ user.profile.avatar.url }}" alt="头像预览" />
+              {% else %}
+                <span id="avatarFallback" class="avatar-fallback" aria-hidden="true">{{ user.username|first|upper }}</span>
+              {% endif %}
+            </div>
+
+            <div class="file-wrap" style="justify-content: center; margin-top: 12px;">
+              {{ avatar_form.avatar }}
+              <label for="id_avatar" class="file-btn">
+                <span class="file-btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 16V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M8.5 9.5 12 6l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M7 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                  </svg>
+                </span>
+                选择图片
+              </label>
+              <div id="avatarFileName" class="file-name muted">未选择任何文件</div>
+            </div>
+            {% if avatar_form.avatar.errors %}<div class="field-error">{{ avatar_form.avatar.errors }}</div>{% endif %}
+          </div>
+
+          <div class="profile-edit-right">
+            {{ form.as_p }}
+            <button type="submit" class="btn" style="width: 100%; justify-content: center;">保存</button>
+          </div>
+        </div>
+      </form>
+      <div class="auth-links">
+        <a class="navbtn navbtn-secondary" href="/me/">返回个人信息</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var input = document.getElementById('id_avatar');
+      var fileName = document.getElementById('avatarFileName');
+      var img = document.getElementById('avatarImg');
+      var fallback = document.getElementById('avatarFallback');
+      var preview = document.getElementById('avatarPreview');
+      if (!input) return;
+
+      input.addEventListener('change', function () {
+        var f = input.files && input.files[0];
+        fileName.textContent = f ? f.name : '未选择任何文件';
+
+        if (!f) return;
+        if (f.type && !f.type.startsWith('image/')) return;
+
+        var url = URL.createObjectURL(f);
+        if (!img) {
+          img = document.createElement('img');
+          img.id = 'avatarImg';
+          img.alt = '头像预览';
+          preview.innerHTML = '';
+          preview.appendChild(img);
+        }
+        img.src = url;
+        if (fallback) fallback.style.display = 'none';
+      });
+    })();
+  </script>
+{% endblock %}

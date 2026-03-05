@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}注册{% endblock %}
+
+{% block content %}
+  <div class="auth-center">
+    <div class="auth-card card">
+      <h1 class="auth-title">注册</h1>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn" style="width: 100%; justify-content: center;">创建账号</button>
+      </form>
+      <div class="auth-links">
+        <a class="navbtn navbtn-secondary" href="/login/">返回登录</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

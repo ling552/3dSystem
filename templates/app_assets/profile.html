@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}个人信息{% endblock %}
+
+{% block content %}
+  <div class="auth-center">
+    <div class="auth-card card">
+      <h1 class="auth-title" style="margin: 4px 0 14px; text-align: center;">个人信息</h1>
+      <div class="profile-top">
+        <div class="avatar avatar-lg">
+          {% if user.profile.avatar %}
+            <img src="{{ user.profile.avatar.url }}" alt="头像" />
+          {% else %}
+            <span class="avatar-fallback" aria-hidden="true">{{ user.username|first|upper }}</span>
+          {% endif %}
+        </div>
+        <div class="profile-username">{{ user.username }}</div>
+      </div>
+
+      <div class="profile-kv">
+        <div><strong>用户名：</strong>{{ user.username }}</div>
+        <div><strong>邮箱：</strong>{{ user.email|default:"-" }}</div>
+        <div><strong>名字：</strong>{{ user.first_name|default:"-" }}</div>
+        <div><strong>姓氏：</strong>{{ user.last_name|default:"-" }}</div>
+      </div>
+
+      <div class="auth-links" style="margin-top: 16px;">
+        <a class="navbtn" href="/me/edit/">设置</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

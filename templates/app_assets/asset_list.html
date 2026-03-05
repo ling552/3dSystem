@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if public_mode %}公开模型{% else %}我的模型{% endif %}{% endblock %}
+
+{% block content %}
+  <h1>{% if public_mode %}公开模型{% else %}我的模型{% endif %}</h1>
+
+  <form method="get" class="toolbar">
+    <input type="text" name="q" value="{{ q }}" placeholder="搜索名称或文件名" />
+    <select name="sort">
+      <option value="new" {% if sort == 'new' %}selected{% endif %}>最新</option>
+      <option value="old" {% if sort == 'old' %}selected{% endif %}>最早</option>
+    </select>
+    <button type="submit" class="btn">搜索</button>
+  </form>
+
+  <div class="table">
+    <div class="row head">
+      <div>名称</div>
+      <div>归属</div>
+      <div>状态</div>
+      <div>大小</div>
+      <div>操作</div>
+    </div>
+    {% for asset in page.object_list %}
+      <div class="row">
+        <div>
+          <div class="name">{{ asset.name }}</div>
+          <div class="muted">{{ asset.original_filename }}</div>
+        </div>
+        <div>{{ asset.owner.username }}</div>
+        <div>{{ asset.get_status_display }}</div>
+        <div>{{ asset.size_bytes }} bytes</div>
+        <div class="actions">
+          <a class="btn small" href="/viewer/{{ asset.id }}/">查看</a>
+          <a class="btn small secondary" href="/assets/{{ asset.id }}/">详情</a>
+          {% if public_mode %}
+            {% if asset.owner_id == user.id %}
+              <a class="btn small danger" href="/assets/{{ asset.id }}/delete/">删除</a>
+            {% endif %}
+          {% else %}
+            <a class="btn small danger" href="/assets/{{ asset.id }}/delete/">删除</a>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <div class="card">暂无模型，先去 <a href="/upload/">上传</a>。</div>
+    {% endfor %}
+  </div>
+
+  {% if page.paginator.num_pages > 1 %}
+    <div class="pagination">
+      {% if page.has_previous %}
+        <a href="?q={{ q }}&sort={{ sort }}&page={{ page.previous_page_number }}">上一页</a>
+      {% endif %}
+      <span>第 {{ page.number }} / {{ page.paginator.num_pages }} 页</span>
+      {% if page.has_next %}
+        <a href="?q={{ q }}&sort={{ sort }}&page={{ page.next_page_number }}">下一页</a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

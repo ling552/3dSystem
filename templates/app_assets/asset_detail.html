@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}模型详情{% endblock %}
+
+{% block content %}
+  <h1>模型详情</h1>
+
+  <div class="card">
+    <div><strong>名称：</strong>{{ asset.name }}</div>
+    <div><strong>文件名：</strong>{{ asset.original_filename }}</div>
+    <div><strong>文件大小：</strong>{{ asset.size_bytes }} bytes</div>
+    <div><strong>可见性：</strong>{{ asset.get_visibility_display }}</div>
+    <div><strong>状态：</strong>{{ asset.get_status_display }}</div>
+    <div><strong>创建时间：</strong>{{ asset.created_at }}</div>
+
+    <div class="actions" style="margin-top: 12px;">
+      <a class="btn" href="/viewer/{{ asset.id }}/">打开查看器</a>
+      <a class="btn secondary" href="/assets/{{ asset.id }}/download/">下载</a>
+    </div>
+  </div>
+{% endblock %}

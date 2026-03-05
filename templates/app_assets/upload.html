@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}上传模型{% endblock %}
+
+{% block content %}
+  <h1>上传模型</h1>
+
+  <div class="hint">
+    支持 .glb / .gltf / .zip（包含贴图/纹理等资源）
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="card" style="max-width: 720px;">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="form-errors">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="id_name">模型名称</label>
+        {{ form.name }}
+        {% if form.name.errors %}<div class="field-error">{{ form.name.errors }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_visibility">可见性</label>
+        <div class="select-wrap">
+          {{ form.visibility }}
+          <span class="select-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+        </div>
+        {% if form.visibility.errors %}<div class="field-error">{{ form.visibility.errors }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_file">模型文件</label>
+        <div class="file-wrap">
+          {{ form.file }}
+          <label for="id_file" class="file-btn">
+            <span class="file-btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 16V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <path d="M8.5 9.5 12 6l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M7 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+            </span>
+            选择文件
+          </label>
+          <div id="fileName" class="file-name muted">未选择任何文件</div>
+        </div>
+        {% if form.file.errors %}<div class="field-error">{{ form.file.errors }}</div>{% endif %}
+      </div>
+    </div>
+
+    <button type="submit" class="btn">开始上传</button>
+  </form>
+
+  <script>
+    (function () {
+      var input = document.getElementById('id_file');
+      var name = document.getElementById('fileName');
+      if (!input || !name) return;
+      input.addEventListener('change', function () {
+        var f = input.files && input.files[0];
+        name.textContent = f ? f.name : '未选择任何文件';
+      });
+    })();
+  </script>
+{% endblock %}

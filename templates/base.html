@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}模型管理系统{% endblock %}</title>
+  <link rel="stylesheet" href="/static/site.css" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <a class="brandbtn" href="/assets/public/">
+          <span class="navicon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 7.5h16M4 12h16M4 16.5h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </span>
+          模型管理
+        </a>
+      </div>
+      <nav class="nav">
+        {% if user.is_authenticated %}
+          <a class="navbtn" href="/assets/">
+            <span class="navicon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 7.5h16M4 12h16M4 16.5h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+            </span>
+            我的模型
+          </a>
+          <a class="navbtn" href="/upload/">
+            <span class="navicon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 16V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <path d="M8.5 9.5 12 6l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M7 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+            </span>
+            上传
+          </a>
+          <div class="user-menu" id="userMenu">
+            <button type="button" class="avatarbtn" id="avatarBtn" aria-haspopup="menu" aria-expanded="false">
+              <span class="avatar avatar-small" aria-hidden="true">
+                {% if user.profile.avatar %}
+                  <img src="{{ user.profile.avatar.url }}" alt="" />
+                {% else %}
+                  <span class="avatar-fallback">{{ user.username|first|upper }}</span>
+                {% endif %}
+              </span>
+              <span class="chev" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+            </button>
+            <div class="menu" id="userDropdown" role="menu">
+              <div class="menu-head">
+                <div class="menu-name">{{ user.username }}</div>
+              </div>
+              <a class="menu-item" role="menuitem" href="/me/">个人信息</a>
+              <a class="menu-item" role="menuitem" href="/me/edit/">设置</a>
+              <div class="menu-sep"></div>
+              <form method="post" action="/logout/" class="menu-item">
+                {% csrf_token %}
+                <button type="submit" class="menu-btn">退出</button>
+              </form>
+            </div>
+          </div>
+        {% else %}
+          <a class="navbtn navbtn-secondary" href="/login/">登录</a>
+          <a class="navbtn" href="/register/">注册</a>
+        {% endif %}
+        <button id="themeToggle" type="button" class="iconbtn" aria-label="切换主题" title="切换主题">
+          <span class="icon" data-icon="sun" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.8" />
+              <path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </span>
+          <span class="icon" data-icon="moon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 13.2A8.2 8.2 0 0 1 10.8 3a6.9 6.9 0 1 0 10.2 10.2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>
+          </span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="message">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    (function () {
+      var btn = document.getElementById('themeToggle');
+      if (!btn) return;
+      function getTheme() {
+        return document.documentElement.getAttribute('data-theme') || 'dark';
+      }
+      function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        try { localStorage.setItem('theme', theme); } catch (e) {}
+      }
+      btn.addEventListener('click', function () {
+        setTheme(getTheme() === 'dark' ? 'light' : 'dark');
+      });
+    })();
+  </script>
+</body>
+</html>
+
+  <script>
+    (function () {
+      var avatarBtn = document.getElementById('avatarBtn');
+      var dropdown = document.getElementById('userDropdown');
+      if (!avatarBtn || !dropdown) return;
+
+      function closeMenu() {
+        dropdown.classList.remove('open');
+        avatarBtn.setAttribute('aria-expanded', 'false');
+      }
+
+      function toggleMenu() {
+        var open = dropdown.classList.toggle('open');
+        avatarBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+
+      avatarBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      document.addEventListener('click', function () {
+        closeMenu();
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenu();
+      });
+    })();
+  </script>
